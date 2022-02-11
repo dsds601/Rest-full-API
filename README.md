@@ -40,3 +40,16 @@
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class UserNotFoundException extends RuntimeException {
 ~~~
+
+6. ResponseEntityExceptionHandler
+   * @ControllerAdvice   // 모든 컨트롤러가 실행시 해당 어노테이션을 가지고 있는 빈이 실행됩니다.
+   * 클래스를 해당 ResponseEntityExceptionHandler 상속받으므 에러가 발생되면 해당 클래스 빈에 에러메시지가 생성이됩니다.
+   ~~~
+    //exceptionhandler 사용 여부와 어떤 에러가 발생하면 사용할지 선택
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request){
+        ExceptionResponse exceptionResponse =
+                new ExceptionResponse(new Date(),ex.getMessage(),request.getDescription(false));
+        return new ResponseEntity(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+   ~~~
