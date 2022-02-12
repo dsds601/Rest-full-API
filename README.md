@@ -163,3 +163,29 @@ public class UserNotFoundException extends RuntimeException {
       * 만들어진 swagger 에 json 형식이나 swagger document 확인할 수 있다.
       * api 문서는 Docket class 에서 정의가 가능하다.
       * 도메인에 대한 api 정의는 도메인 객체 클래스에서 @ApiMode description 추가가 가능하다
+
+12. API 모니터링
+    ~~~
+    <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    ~~~
+    * dependency 추가로만으로도 어떤 API가 구동되는지 알 수 있다.
+    ~~~
+    추가로 더 많은 정보를 확인 할 수 있다.
+    management:
+    endpoint:
+    web:
+    exporsure:
+    include: "*"
+    ~~~
+    
+13. HAL(Hypertext Application Language)
+    * hypertext 로 api 부가적 기능 제공
+
+14. security
+    * 패스워드 자동 생성 됨 : fae0a308-073c-4651-9daa-7beac9185e2e
+    * security 설정후 api 메서드 이용시 에러가 남 헤더값에 인증값 입력
+    * Authorization Basic Author name password 입력
+    * 자동생성이 아닌 아이디와 패스워드 설정후 입력 하는법

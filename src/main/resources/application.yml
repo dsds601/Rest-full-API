@@ -9,3 +9,9 @@ server:
 spring:
   message:
     basename: messages
+
+management:
+  endpoint:
+    web:
+      exporsure:
+        include: "*"
