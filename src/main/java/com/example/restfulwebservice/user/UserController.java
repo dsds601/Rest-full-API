@@ -1,5 +1,9 @@
 package com.example.restfulwebservice.user;
 
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.EntityMode;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +13,10 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
+
+@Slf4j
 @RestController
 public class UserController {
     private UserDaoService service;
@@ -23,12 +31,16 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    public User retrieveUser (@PathVariable int id) {
+    public ResponseEntity<EntityModel<User>> retrieveUser (@PathVariable int id) {
         User user = service.findOne(id);
         if(user == null){
             throw new UserNotFoundException(String.format("ID[%s] not found",id));
         }
-        return user;
+        //HATEOAS
+        EntityModel entityModel = EntityModel.of(user);
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllUsers());
+        entityModel.add(linkTo.withRel("all-users"));
+        return ResponseEntity.ok(entityModel);
     }
 
     @PostMapping("/users")

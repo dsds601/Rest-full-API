@@ -116,3 +116,50 @@ public class UserNotFoundException extends RuntimeException {
         mapping.setFilters(filters);
     return mapping;
    ~~~
+* BeanUtils -> Bean관련 util 라이브러리
+
+9. version 관리
+   1. 파라미터와 pathvariable 로 가능하다.
+   ~~~
+   @GetMapping("/v1/users/{id}")
+   @GetMapping(value = "/users/{id}/", params = "version=1")
+   ~~~
+   2. header로 관리
+   ~~~
+   @GetMapping(value = "/users/{id}", headers = "X-API-VERSION=1")
+   ~~~
+   3. produces minetype이용 방법
+   ~~~
+   @GetMapping(value = "/v1/users/{id}" , produces = "/application/vnd.company/appv2+json")
+   ~~~
+
+10. HATEOAS (Hypermedia As the Engine Of Applcation Services)
+    * 현재 호출된 자원의 상태 정보 제공
+    스프링 버전에 따른 클래스
+    * 2.18 : Resource
+             ControllerLinkBuilder
+    ~~~
+    //HATEOAS
+        Resource<User> resource = new Resource<>(user);
+        ControllerLinkBuilder linkTo = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
+        resource.add(linkTo.withRel("all-users"));
+    ~~~
+    * 2.2 : Resource -> EntityModel
+            ControllerLinkBuilder ->  WebMvcLinkBuilder
+    ~~~
+    @GetMapping("/users/{id}")
+    public ResponseEntity<EntityModel<User>> retrieveUser (@PathVariable int id) {
+    //HATEOAS
+        EntityModel entityModel = EntityModel.of(user);
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveAllUsers());
+        entityModel.add(linkTo.withRel("all-users"));
+        return ResponseEntity.ok(entityModel);
+    ~~~
+    
+11. swagger
+    * Docket 클래스로 swagger Config파일을 만들 수 있다.
+      * http://localhost:8088/v2/api-docs / http://localhost:8088/swagger-ui/index.html
+      * 만들어진 swagger 에 json 형식이나 swagger document 확인할 수 있다.
+      * api 문서는 Docket class 에서 정의가 가능하다.
+      * 도메인에 대한 api 정의는 도메인 객체 클래스에서 @ApiMode description 추가가 가능하다
