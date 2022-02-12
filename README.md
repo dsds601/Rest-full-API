@@ -53,3 +53,66 @@ public class UserNotFoundException extends RuntimeException {
         return new ResponseEntity(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
    ~~~
+   
+7. 다국어 지원 API 
+   * 다국어를 사용할 properties 문서를 정의한다. (messages 라는 properties에 정의)
+   ~~~
+     spring:
+       message:
+       basename: messages
+   ~~~
+   * Bean을 지정해 다국어 default값설정
+* ~~~
+  	@Bean
+	public LocaleResolver localeResolver () {
+		SessionLocaleResolver localeResolver = new SessionLocaleResolver();
+		localeResolver.setDefaultLocale(Locale.KOREA);
+		return localeResolver;
+	}
+  ~~~
+  * 다국어 사용할 api메서드 설정
+      * MessageSource 클래스를 사용하여 다국어 설정을 한다.
+      * header 에 Accept-Language를 통해 나라별 호출값을 받아 맞게 호출한다.
+    ~~~
+    greeting.message -> properties에 설정한 응답값
+    
+    @GetMapping(path = "/hello-world-internationalized")
+    public String hellWorldInternationalized(@RequestHeader(name = "Accept-Language",required=false) Locale locale) {
+        log.info("country {} ",locale.getCountry());
+        return source.getMessage("greeting.message",null,locale);
+    }
+    ~~~
+  
+8. API filtering
+   * 외부에 노출시키고 싶지 않은 값이 있다면 방법
+     * Jackson lib 이용
+       1. 필드에 두는 방법
+       2. 클래스에 두는 방법
+     ~~~
+     @JsonIgnore
+     private String password;
+     
+     @JsonIgnoreProperties(value = {"password","ssn"})
+     public class User {
+     ~~~
+   * 관리자에겐 사용자에 정보를 모두 보여주고 사용자에겐 부분적으로 보여주고 싶다면
+   ~~~
+   DTO 에 jsonFilter를 사용할껄 명시하고 컨트롤러에서 filter를 이용하여 조ㄱ
+   
+   @JsonFilter("UserInfo")
+   public class User {
+   
+    ctr에 응답값도 MappingJacksonValue 변형
+   @GetMapping
+   public MappingJacksonValue retrieveUser (@PathVariable int id) {
+   
+   SimpleBeanPropertyFilter filter = SimpleBeanPropertyFilter
+                .filterOutAllExcept("id","name","joinDate","ssn"); //전달할 응답값 id값
+   //위에 만든 필터를 적용할떄 어떤 빈에 적용할지 id 값을 넣어야 한다.
+    FilterProvider filters = new SimpleFilterProvider().addFilter("UserInfo",filter);
+
+        //Object json 응답값으로 변형
+        MappingJacksonValue mapping = new MappingJacksonValue(user);
+        mapping.setFilters(filters);
+    return mapping;
+   ~~~
