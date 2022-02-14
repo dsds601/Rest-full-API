@@ -189,3 +189,40 @@ public class UserNotFoundException extends RuntimeException {
     * security 설정후 api 메서드 이용시 에러가 남 헤더값에 인증값 입력
     * Authorization Basic Author name password 입력
     * 자동생성이 아닌 아이디와 패스워드 설정후 입력 하는법
+    * yml 이용
+    ~~~
+    spring:
+    message:
+    basename: messages
+    security:
+    user:
+    name: admin
+    password: admin
+    ~~~
+    * yml 설정 파일 이용하는건 너무 번거롭고 효율적이지 못한다. 설-정 파일을 통해 인메모리 방식 데이터베이스 방식 로그인으로 사용 할 수 있다.
+    ~~~
+    @Configuration
+    public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    public void configureGlobal (AuthenticationManagerBuilder auth) throws Exception {
+        //AuthenticationManagerBuilder jdbc 관련 인증 또는 메모리를 통한 인증방식 사용 가능
+        //.password("{12345") <-pliain Text 에러 발생 Encoding 없이 사용한다고 명시해야 에러가 안납니다.
+        auth.inMemoryAuthentication()
+                .withUser("gunho")
+                .password("{noop}12345")
+                .roles("USERS"); //login시 사용 권한
+    }
+    ~~~
+    * security 를 사용시 디비 접근 등이 어렵다 -> 권한을 풀어야함
+    1. JPA
+       * 자바 ORM 기술 API 명세 (인터페이스)
+       * Hibernate : JPA 구현체 인터페이스 직접 구현한 라이브러리
+       * Spring Data JPA : JPA를 추상한  Repository Module
+       ISSUED
+         * ~.sql 파일을 실행하려 하는데 에러가 낫다
+           -> application.yml(또는 properties)에 spring.jpa.defer-datasource-initialization 옵션 값을 true로 추가
+         ~~~
+         jpa:
+             defer-datasource-initialization: true
+         ~~~
