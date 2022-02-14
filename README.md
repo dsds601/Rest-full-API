@@ -226,3 +226,15 @@ public class UserNotFoundException extends RuntimeException {
          jpa:
              defer-datasource-initialization: true
          ~~~
+    2. JPA 통한 hateoas
+    ~~~
+    @GetMapping("/users/{id}")
+    public ResponseEntity<EntityModel> retrieveUser(@PathVariable int id){
+    Optional<User> user = userRepository.findById(id);
+    user.orElseThrow(() -> new UserNotFoundException(String.format("ID{%s} not found",id)));
+    EntityModel<User> resource = EntityModel.of(user.get());
+    WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).findAll());
+    resource.add(linkTo.withRel("all-User"));
+    return ResponseEntity.ok(resource);
+    }
+    ~~~
