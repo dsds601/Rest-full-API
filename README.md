@@ -219,8 +219,8 @@ public class UserNotFoundException extends RuntimeException {
        * 자바 ORM 기술 API 명세 (인터페이스)
        * Hibernate : JPA 구현체 인터페이스 직접 구현한 라이브러리
        * Spring Data JPA : JPA를 추상한  Repository Module
-       ISSUED
-         * ~.sql 파일을 실행하려 하는데 에러가 낫다
+       ISSUE
+         * ~.sql 파일을 실행하려 하는데 에러가 발생 **Spring boot 2.5x 이후부턴 추가 필요**
            -> application.yml(또는 properties)에 spring.jpa.defer-datasource-initialization 옵션 값을 true로 추가
          ~~~
          jpa:
